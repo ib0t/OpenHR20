@@ -171,7 +171,7 @@ uint8_t EEPROM ee_config[][4] ={  // must be alligned to 4 bytes
   /* 15 */  {10,         10,        1,       64},   //!< motor_pwm_max_step             
   /* 16 */  {255,       255,        0,      255},   //!< manual calibration L
   /* 17 */  {255,       255,        0,      255},   //!< manual calibration H
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC) || defined(THERMY_V3)
   /* 18 */  {605-TEMP_CAL_OFFSET,605-TEMP_CAL_OFFSET, 0,        255},   //!< value for 35C => 605 temperature calibration table 
   /* 19 */  {645-605,645-605,      16,      255},   //!< value for 30C => 645 temperature calibration table
   /* 1a */  {685-645,685-645,      16,      255},   //!< value for 25C => 685 temperature calibration table

@@ -36,7 +36,7 @@
 #define DEBUG_MODE 1
 #define DEBUG_SKIP_DATETIME_SETTING_AFTER_RESET 0
 
-#if (DEBUG_MODE == 1) && !defined(THERMOTRONIC)
+#if (DEBUG_MODE == 1) && !defined(THERMOTRONIC) && !(defined(THERMY_V3))
     #define DEBUG_BEFORE_SLEEP() (PORTE &= ~(1<<PE2))
     #define DEBUG_AFTER_SLEEP() (PORTE |= (1<<PE2))
 #else

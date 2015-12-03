@@ -38,25 +38,45 @@
 *****************************************************************************/
 
 // How is the H-Bridge connected to the AVR?
+#ifdef THERMOTRONIC
 #define MOTOR_HR20_PE3     PE3     //!< HR20: pin to activate photo eye
 #define MOTOR_HR20_PE3_P   PORTE   //!< HR20: port to activate photo eye
+#endif
+#ifdef THERMY_V3
+#define MOTOR_HR20_PE3     PE2     //!< HR20: pin to activate photo eye
+#define MOTOR_HR20_PE3_P   PORTE   //!< HR20: port to activate photo eye
+#endif
 
 static inline void MOTOR_H_BRIDGE_open(void) {
+#ifdef THERMY_V3
+   PORTE |= (1<<PE7);
+   PORTE &= ~(1<<PE6);
+#else
    PORTG  =  (1<<PG4);   // PG3 LOW, PG4 HIGH
 #ifndef THERMOTRONIC   //not needed (no enable-Pin for motor) 
    PORTB |=  (1<<PB7);   // PB7 HIGH
 #endif
+#endif
 }
 static inline void MOTOR_H_BRIDGE_close(void) {
+#ifdef THERMY_V3
+   PORTE |= (1<<PE6);
+   PORTE &= ~(1<<PE7);
+#else
    PORTG  =  (1<<PG3);   // PG3 HIGH, PG4 LOW
 #ifndef THERMOTRONIC   //not needed (no enable-Pin for motor) 
    PORTB &= ~(1<<PB7);   // PB7 LOW
 #endif
+#endif
 }
 static inline void MOTOR_H_BRIDGE_stop(void) {
+#ifdef THERMY_V3
+   PORTE &= ~((1<<PE6) | (1<<PE7));
+#else
    PORTG  =  0;          // PG3 LOW, PG4 LOW
 #ifndef THERMOTRONIC   //not needed (no enable-Pin for motor) 
    PORTB &= ~(1<<PB7);   // PB7 LOW
+#endif
 #endif
 }
 
@@ -64,7 +84,7 @@ static inline void MOTOR_H_BRIDGE_stop(void) {
 //! How many photoeye impulses maximal form one endposition to the other. <BR>
 //! The value measured on a HR20 are 737 to 740 (385 - 390 for THERMOTRONIC)= so more than 1000 (500) should
 //! never occure if it is mounted
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC) || defined(THERMY_V3)
 #define	MOTOR_MAX_IMPULSES 500
 #define	MOTOR_MIN_IMPULSES 50
 #else

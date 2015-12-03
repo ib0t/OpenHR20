@@ -228,11 +228,19 @@ static void MOTOR_Control(motor_dir_t direction) {
         // stop pwm signal
         TCCR0A = 0;
 #else
+#ifdef THERMY_V3
+        PCMSK0 &= ~(1<<PCINT3);                         // disable interrupt
+        MOTOR_HR20_PE3_P &= ~(1<<MOTOR_HR20_PE3);       // deactivate photo eye
+		#if DEBUG_PRINT_MOTOR
+			COM_putchar((PINE & _BV(PE3))?'Y':'y');
+		#endif
+#else
         PCMSK0 &= ~(1<<PCINT4);                         // disable interrupt
         MOTOR_HR20_PE3_P &= ~(1<<MOTOR_HR20_PE3);       // deactivate photo eye
             #if DEBUG_PRINT_MOTOR
                 COM_putchar((PINE & _BV(PE4))?'Y':'y');
             #endif
+#endif
 		MOTOR_H_BRIDGE_stop();
         // stop pwm signal
         TCCR0A = (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
@@ -257,8 +265,10 @@ static void MOTOR_Control(motor_dir_t direction) {
             TCNT0 = 0;
             TIMSK0 = (1<<TOIE0); //enable interrupt from timer0 overflow
             pine_last=PINE;
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC)
             PCMSK0 |= (1<<PCINT1); // enable interrupt from eye
+#elif defined(THERMY_V3)
+            PCMSK0 |= (1<<PCINT3); // enable interrupt from eye
 #else
             PCMSK0 |= (1<<PCINT4); // enable interrupt from eye
 #endif
@@ -266,7 +276,7 @@ static void MOTOR_Control(motor_dir_t direction) {
             if ( direction == close) {
                 // set pins of H-Bridge
                 MOTOR_H_BRIDGE_close();
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC) || defined(THERMY_V3)
 				TCCR0A = (1<<CS00); //start timer (no PWM)
 #else
                 // set PWM non inverting mode
@@ -276,15 +286,17 @@ static void MOTOR_Control(motor_dir_t direction) {
             } else {
                 // set pins of H-Bridge
 				MOTOR_H_BRIDGE_open();
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC) || defined(THERMY_V3)
 				TCCR0A = (1<<CS00); //start timer (no PWM)
 #else
                 TCCR0A=(1<<WGM00)|(1<<WGM01)|(1<<COM0A1)|(1<<COM0A0)|(1<<CS00);
 #endif
             }
             #if DEBUG_PRINT_MOTOR
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC)
                 COM_putchar((PINE & _BV(PE1))?'X':'x');
+#elif defined(THERMY_V3)
+                COM_putchar((PINE & _BV(PE3))?'X':'x');
 #else
                 COM_putchar((PINE & _BV(PE4))?'X':'x');
 #endif
@@ -407,15 +419,19 @@ ISR (PCINT0_vect){
 	#endif
     // motor eye
     // count  HIGH impulses for HR20 and LOW Pulses for THERMOTRONIC
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC)
     if ((PCMSK0 & (1<<PCINT1)) && (((pine ^ pine_last) & (1<<PE1)) != 0)) {
+#elif defined(THERMY_V3)
+    if ((PCMSK0 & (1<<PCINT3)) && (((pine ^ pine_last) & (1<<PE3)) != 0)) {
 #else
     if ((PCMSK0 & (1<<PCINT4)) && (((pine ^ pine_last) & (1<<PE4)) != 0)) {
 #endif
         uint16_t dur = motor_diag_cnt - last_eye_change;
         last_eye_change = motor_diag_cnt;
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC)
         if ((pine & _BV(PE1))!=0) {
+#elif defined(THERMY_V3)
+        if ((pine & _BV(PE3))!=0) {
 #else
         if ((pine & _BV(PE4))==0) {
 #endif
@@ -435,6 +451,10 @@ ISR (PCINT0_vect){
                 		TCCR0A = 0;//tvossi (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
                         task|=(TASK_MOTOR_STOP);
                         PCMSK0 &= ~(1<<PCINT1); // disable eye interrupt
+#elif defined(THERMY_V3)
+                        TCCR0A = 0;//tvossi (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
+						task|=(TASK_MOTOR_STOP);
+						PCMSK0 &= ~(1<<PCINT3); // disable eye interrupt
 #else
                 		TCCR0A = (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
                         task|=(TASK_MOTOR_STOP);
@@ -476,6 +496,10 @@ ISR (TIMER0_OVF_vect){
 		TCCR0A = 0;//tvossi (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
         task|=(TASK_MOTOR_STOP);
         PCMSK0 &= ~(1<<PCINT1); // disable eye interrupt
+#elif defined(THERMY_V3)
+		TCCR0A = 0;//tvossi (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
+        task|=(TASK_MOTOR_STOP);
+        PCMSK0 &= ~(1<<PCINT3); // disable eye interrupt
 #else
 		TCCR0A = (1<<WGM00) | (1<<WGM01); // 0b 0000 0011
         task|=(TASK_MOTOR_STOP);

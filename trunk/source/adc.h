@@ -39,7 +39,11 @@
 *****************************************************************************/
 
 // hardware configuration 
-#ifdef THERMOTRONIC
+#ifdef THERMY_V3
+#define ADC_TEMP_MUX       0x01    //!< ADC-Channel for Temp-Sensor (ADMUX)
+#define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
+#define ADC_ACT_TEMP       PF3   //!< Bit to activate the TempSensor
+#elif defined(THERMOTRONIC)
 #define ADC_TEMP_MUX       0x00    //!< ADC-Channel for Temp-Sensor (ADMUX)
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
 #define ADC_ACT_TEMP       PF2   //!< Bit to activate the TempSensor
@@ -56,7 +60,7 @@
 #define bat_average (ring_average[BAT_RING_TYPE])
 #define AVGS_BUFFER_LEN (4*8) // 4 per minute * 8
 
-#ifdef THERMOTRONIC
+#if defined(THERMOTRONIC) || defined(THERMY_V3)
 #define TEMP_CAL_OFFSET 380 // offset of calibration points [ADC units]
 #else
 #define TEMP_CAL_OFFSET 256 // offset of calibration points [ADC units]

@@ -53,7 +53,11 @@
 #define LCD_CONTRAST_MAX      15   //!< \brief contrast maxmum
 #define LCD_MAX_POS            4   //!< \brief number of 7 segment chars
 #define LCD_MAX_CHARS  (sizeof(LCD_CharTablePrgMem))   //!< \brief no. of chars in \ref LCD_CharTablePrgMem
+#ifdef THERMY_V3
+#define LCD_REGISTER_COUNT    18
+#else
 #define LCD_REGISTER_COUNT     9   //!< \brief no. of registers each bitplane
+#endif
 
 
 // Vars
@@ -65,6 +69,57 @@ volatile uint8_t LCD_Data[LCD_BITPLANES][LCD_REGISTER_COUNT];
 
 // Look-up table to convert value to LCD display data (segment control)
 // Get value with: bitmap = pgm_read_byte(&LCD_CharTablePrgMem[position]);
+#ifdef THERMY_V3
+const uint16_t LCD_CharTablePrgMem[] PROGMEM =
+{
+		0x00C0, // -
+		0, // .
+		0, // /
+		0x003F,		//0
+		0x0406,		//1
+		0x00DB,		//2
+		0x008F,		//3
+		0x00E6,		//4
+		0x00ED,		//5
+		0x00FD,		//6
+		0x1401,		//7
+		0x00FF,		//8
+		0x00EF,		//9
+		0x1200,		//:
+		0x0C00,		// //
+		0x2400,		// <
+		0x00C1,		//=
+		0x0900,		//>
+		0x1421,		//?
+		0x2D3F,		//@
+		0x00F7,		//A
+		0x128F,		//B
+		0x0039,		//C
+		0x120F,		//D
+		0x00F9,		//E a f e d g1 g2
+		0x00F1,		//F a f e g1 g2
+		0x00BD,		//G a f e d c g2
+		0x00F6,		//H f e g1 g2 b c
+		0x1209,		// I a i l d
+		0x001E,		// J b c d e
+		0x2470,		// K f e g1 j m
+		0x0038,		// L f e d
+		0x0536, 	// M f e h j b c
+		0x2136,		// N f e h m c b
+		0x003F,		// O a f e d b c
+		0x00F3,		// P f e a b g1 g2
+		0x203F,		// Q a f e d b c m
+		0x20F3,		// R a f e b g1 g2 m
+		0x018D,		// S a h g2 c d
+		0x1201,		// T i l a
+		0x003E,		// U f e d b c
+		0x0C30,		// V f e k j
+		0x2836,		// W f e k m c b
+		0x2D00,		// X h m k j
+		0x1500,		// Y h j l
+		0x0C09		// Z a j k d
+};
+#else
 const uint8_t LCD_CharTablePrgMem[] PROGMEM =
 {
     0x3F, //      0:0x3F   1:0x06   2:0x5B   3:0x4F   4:0x66   5:0x6D   6:0x7D
@@ -115,7 +170,84 @@ const uint8_t LCD_CharTablePrgMem[] PROGMEM =
           //40    ******   ******   ******   ******   ******
           //41   0111000  1011000  0111110  1111000  1101110
 };
+#endif
 
+#ifdef THERMY_V3
+#if LANG==LANG_uni
+  // Look-up chars table for LCD strings (universal/numbers)
+  const char LCD_StringTable[][4] PROGMEM =
+  {
+		  " 1-7",
+		  "  MO",
+		  "  DU",
+		  "  WE",
+		  "  TH",
+		  "  FR",
+		  "  SA",
+		  "  SU",
+		  "BLOC",
+		  "----",
+	      " -C-",    //!<  " -C-"    LCD_STRING_minusCminus
+	      " ERR",    //!<  " Err"    LCD_STRING_Err
+	      "OFF ",    //!<  "OFF "    LCD_STRING_OFF
+	      "ON  ",    //!<  "On  "    LCD_STRING_On
+	      "OPEN",    //!<  "OPEn"    LCD_STRING_OPEn
+	      "BATT",    //!<  "BAtt"    LCD_STRING_BAtt
+	      " E2 ",    //!<  " E2 "    LCD_STRING_E2
+	      " E3 ",    //!<  " E3 "    LCD_STRING_E3
+	      "EEPR",    //!<  "EEPr"    LCD_STRING_EEPr
+  };
+
+#elif LANG==LANG_de
+  // Look-up chars table for LCD strings (german)
+  const uint8_t LCD_StringTable[][4] PROGMEM =
+  {
+      {32, 1,22, 7},    //!<  " 1-7"
+      {33,34,31,32},    //!<  Montag:     'rno '
+      {32,13,30,32},    //!<  Dienstag:   ' di '
+      {33,34,30,32},    //!<  Mittwoch:   'rni '
+      {32,13,31,32},    //!<  Donnerstag: ' do '
+      {32,15,28,32},    //!<  Freitag:    ' Fr '
+      {32, 5,10,32},    //!<  Samstag:    ' SA '
+      {32, 5,31,32},    //!<  Sonntag:    ' So '
+      {11, 1,31,36},    //!<  "b1oc"    LCD_STRING_bloc
+      {22,22,22,22},    //!<  "----"    LCD_STRING_4xminus
+      {32,22,12,22},    //!<  " -C-"    LCD_STRING_minusCminus
+      {32,14,28,28},    //!<  " Err"    LCD_STRING_Err
+      { 0,15,15,32},    //!<  "OFF "    LCD_STRING_OFF
+      { 0,29,32,32},    //!<  "On  "    LCD_STRING_On
+      { 0,18,14,29},    //!<  "OPEn"    LCD_STRING_OPEn
+      {11,10,38,38},    //!<  "BAtt"    LCD_STRING_BAtt
+      {32,14, 2,32},    //!<  " E2 "    LCD_STRING_E2
+      {32,14, 3,32},    //!<  " E3 "    LCD_STRING_E3
+      {14,14,18,28},    //!<  "EEPr"    LCD_STRING_EEPr
+  };
+#elif LANG==LANG_cs
+  // Look-up chars table for LCD strings (czech)
+  uint8_t LCD_StringTable[][4] PROGMEM =
+  {
+      {32, 1,22, 7},    //!<  " 1-7"
+      {32,18,31,22},    //!<  " Po "
+      {32,37,38,22},    //!<  " Ut "
+      {32, 5,38,22},    //!<  " St "
+      {32,12,38,22},    //!<  " Ct "
+      {32,18,10,22},    //!<  " PA "
+      {32, 5,31,22},    //!<  " So "
+      {32,29,14,22},    //!<  " nE "
+      {11, 1,31,36},    //!<  "b1oc"    LCD_STRING_bloc
+      {22,22,22,22},    //!<  "----"    LCD_STRING_4xminus
+      {32,22,12,22},    //!<  " -C-"    LCD_STRING_minusCminus
+      {32,14,28,28},    //!<  " Err"    LCD_STRING_Err
+      { 0,15,15,32},    //!<  "OFF "    LCD_STRING_OFF
+      { 0,29,32,32},    //!<  "On  "    LCD_STRING_On
+      { 0,18,14,29},    //!<  "OPEn"    LCD_STRING_OPEn
+      {11,10,38,38},    //!<  "BAtt"    LCD_STRING_BAtt
+      {32,14, 2,32},    //!<  " E2 "    LCD_STRING_E2
+      {32,14, 3,32},    //!<  " E3 "    LCD_STRING_E3
+      {14,14,18,28},    //!<  "EEPr"    LCD_STRING_EEPr
+  };
+#endif
+#else
 #if LANG==LANG_uni
   // Look-up chars table for LCD strings (universal/numbers)
   const uint8_t LCD_StringTable[][4] PROGMEM =
@@ -189,9 +321,20 @@ const uint8_t LCD_CharTablePrgMem[] PROGMEM =
       {14,14,18,28},    //!<  "EEPr"    LCD_STRING_EEPr
   };
 #endif
+#endif
 
 
+#ifdef THERMY_V3
+#define SEGMENTS_PER_DIGIT 14
+static const uint8_t LCD_Segments[] PROGMEM = {
 
+		126,124, 44,  5,  7,127, 47, 85, 87, 86,125, 6, 46,  45,	//left Digit
+		123,121,  1,  2,  4, 84, 43, 81, 83, 82,122, 3, 42,  41,	//middle left Digit
+		137,139, 59, 18, 16,136, 56, 98, 96, 97,138, 17, 57, 58,	//middle right Digit
+		140,142, 22, 21, 19, 99, 60,102,100,101,141, 20, 61, 62		//right Digit
+};
+#else
+#define SEGMENTS_PER_DIGIT 7
 // Look-up table to adress element F for one Position. ( 32 : 10 )
 const uint8_t LCD_FieldOffsetTablePrgMem[] PROGMEM =
 {
@@ -217,6 +360,7 @@ const uint8_t LCD_SegOffsetTablePrgMem[] PROGMEM =
      0,    //  Seg F           E    C
      1     //  Seg G            DDDD
 };
+#endif
 
 //! Look-up table for adress hour-bar segments
 const uint8_t LCD_SegHourBarOffsetTablePrgMem[] PROGMEM =
@@ -227,6 +371,9 @@ const uint8_t LCD_SegHourBarOffsetTablePrgMem[] PROGMEM =
     LCD_SEG_B15,   LCD_SEG_B16,   LCD_SEG_B17,   LCD_SEG_B18,   LCD_SEG_B19,
     LCD_SEG_B20,   LCD_SEG_B21,   LCD_SEG_B22,   LCD_SEG_B23
 };
+
+/* Mo - So, LCDDR16 */
+static const uint8_t LCD_WeekdaySegments[] PROGMEM = {128, 129, 130, 131, 132, 133, 95};
 
 
 static void LCD_calc_used_bitplanes(uint8_t mode);
@@ -244,20 +391,38 @@ void LCD_Init(void)
     // Clear segment buffer.
     LCD_AllSegments(false);
 
-    //Set the initial LCD contrast level
+//Set the initial LCD contrast level and display on time
+#ifdef THERMY_V3
+    LCDCCR = (1<<LCDDC2)|(0<<LCDDC1)|(0<<LCDDC0)|(config.lcd_contrast << LCDCC0);
+#else
     LCDCCR = (config.lcd_contrast << LCDCC0);
+#endif
 
     // LCD Control and Status Register B
+#ifdef THERMY_V3
+    //   - clock source is TOSC1 pin
+    //   - COM0:3 connected
+    //   - SEG0:24 connected
+    LCDCRB = (1<<LCDCS)|(0<<LCD2B)|(1<<LCDMUX1)|(1<<LCDMUX0)|(1<<LCDPM2)|(1<<LCDPM1)|(1<<LCDPM0);
+#else
     //   - clock source is TOSC1 pin
     //   - COM0:2 connected
     //   - SEG0:22 connected
 	LCDCRB = (1<<LCDCS) | (1<<LCDMUX1) | (1<<LCDPM2)| (1<<LCDPM0);
+#endif
 
     // LCD Frame Rate Register
+#ifdef THERMY_V3
+    //   - LCD Prescaler Select N=16       @32.768Hz ->   2048Hz
+    //   - LCD Duty Cycle 1/3 (K=8)       2048Hz / 8 -> 256Hz
+    //   - LCD Clock Divider  (D=2)        256Hz / 2 -> 128Hz
+	LCDFRR = (0<<LCDPS2)|(0<<LCDPS1)|(0<<LCDPS0)|(0<<LCDCD2)|(0<<LCDCD1)|(1<<LCDCD0);
+#else
     //   - LCD Prescaler Select N=16       @32.768Hz ->   2048Hz
     //   - LCD Duty Cycle 1/3 (K=6)       2048Hz / 6 -> 341,33Hz
     //   - LCD Clock Divider  (D=5)     341,33Hz / 7 ->  47,76Hz
     LCDFRR = ((1<<LCDCD2)|(1<<LCDCD1));
+#endif
 
     // LCD Control and Status Register A
     //  - Enable LCD
@@ -292,6 +457,7 @@ void LCD_AllSegments(uint8_t mode)
     LCD_Update();
 }
 
+
 /*!
  *******************************************************************************
  *  Print char in LCD field
@@ -310,10 +476,32 @@ void LCD_AllSegments(uint8_t mode)
  *        - 0: clears all digits,
  *        - other: set all digits
  ******************************************************************************/
+#ifdef THERMY_V3
+void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode){
+	char c;
+	if(value < 10){
+		c = '0' + value;
+	} else if(value < 16){
+		c = 'A' + value - 10;
+	}
+	else{
+		c = value;
+	}
+	LCD_PrintASCIIChar(c,pos,mode);
+}
+
+void LCD_PrintASCIIChar(char c, uint8_t pos, uint8_t mode){
+	uint8_t value = c - FIRST_CHAR;
+#else
 void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode)
 {
     uint8_t fieldbase;
+#endif
+#if SEGMENTS_PER_DIGIT > 7
+    uint16_t bitmap;
+#else
     uint8_t bitmap;
+#endif
     uint8_t seg;
     uint8_t i;
     uint8_t mask;
@@ -321,16 +509,22 @@ void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode)
     // Boundary Check 
     if ((pos < LCD_MAX_POS) && (value < LCD_MAX_CHARS)) {
 
+#ifndef THERMY_V3
         // Get Fieldbase for Position
         fieldbase = pgm_read_byte(&LCD_FieldOffsetTablePrgMem[pos]);
+#endif
 
         // Get Bitmap for Value
         bitmap = pgm_read_byte(&LCD_CharTablePrgMem[value]);
         mask = 1;
 
-        // Set 7 Bits
-        for (i=0; i<7; i++){
+        // Set Bits
+        for (i=0; i<SEGMENTS_PER_DIGIT; i++){
+#ifdef THERMY_V3
+        	seg = pgm_read_byte(&LCD_Segments[pos*SEGMENTS_PER_DIGIT + i]);
+#else
             seg = fieldbase + pgm_read_byte(&LCD_SegOffsetTablePrgMem[i]);
+#endif
             // Set or Clear?
             LCD_SetSeg(seg,((bitmap & mask)?mode:LCD_MODE_OFF));
             mask <<= 1;
@@ -580,6 +774,12 @@ void LCD_SetHourBarSeg(uint8_t seg, uint8_t mode)
     LCD_SetSeg(segment, mode);
 }
 
+void LCD_PrintDayOfWeek(uint8_t dow,uint8_t mode)
+{
+	if(dow < 7){
+		LCD_SetSeg(pgm_read_byte(&LCD_WeekdaySegments[dow]),mode);
+	}
+}
 /*!
  *******************************************************************************
  *  Set all segments of the hour-bar (ON/OFF) like bitmap
@@ -876,6 +1076,12 @@ void task_lcd_update(void) {
 	if (LCD_force_update) {
 		LCD_force_update=0;
 		// Copy desired segment buffer to the real segments
+#ifdef THERMY_V3
+		int i;
+		for(i = 0;i < LCD_REGISTER_COUNT; i++){
+			*(&LCDDR0 + i) = LCD_Data[LCD_Bitplane][i];
+		}
+#else
     	LCDDR0 = LCD_Data[LCD_Bitplane][0];
     	LCDDR1 = LCD_Data[LCD_Bitplane][1];
     	LCDDR2 = LCD_Data[LCD_Bitplane][2];
@@ -885,6 +1091,7 @@ void task_lcd_update(void) {
     	LCDDR10 = LCD_Data[LCD_Bitplane][6];
     	LCDDR11 = LCD_Data[LCD_Bitplane][7];
     	LCDDR12 = LCD_Data[LCD_Bitplane][8];
+#endif
 	}
 
 

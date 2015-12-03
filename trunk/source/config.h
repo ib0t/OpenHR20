@@ -68,7 +68,7 @@ In this file we define only configuration parameters, for example what kind of c
 
 // Parameters for the COMM-Port
 #define COM_BAUD_RATE 9600
-#ifndef THERMOTRONIC //No serialport implementet yet
+#ifdef HONEYWELL //No serialport implementet yet
 // Note we should only enable of of the following at one time
 /* we support RS232 */
 #define COM_RS232 1

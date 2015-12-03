@@ -55,7 +55,7 @@ extern uint16_t kb_events;
 #define KEYBOARD_NOISE_CANCELATION 50 //!< unit is 1/256s depend to RTC
 
 // names for keys
-#ifdef THERMOTRONIC
+#if (defined(THERMOTRONIC) || defined(THERMY_V3))
 #define KBI_MONT 	(1 << 0)
 #define KBI_C		(1 << 2) 
 #define KBI_PROG	(1 << 1) 
@@ -76,7 +76,7 @@ void task_keyboard(void);
 void task_keyboard_long_press_detect(void);
 bool mont_contact_pooling(void);
 
-#ifdef THERMOTRONIC
+#if (defined(THERMOTRONIC) || defined(THERMY_V3))
 //THERMOTRONIC has no contact, not needed this macros
 #define enable_mont_input()
 #define disable_mont_input()
@@ -85,7 +85,7 @@ bool mont_contact_pooling(void);
 #define disable_mont_input() ( PORTB &= ~(1<<PB0), DDRB |= (1<<PB0) )
 #endif
 
-#ifdef THERMOTRONIC
+#if (defined(THERMOTRONIC) || defined(THERMY_V3))
 // THERMOTRONIC has external pull-down resistors, not needed this macros 
 #define enable_rot2_input() 
 #define disable_rot2_input()

@@ -147,7 +147,7 @@ static void COM_flush (void) {
 		#if (defined COM_RS232) || (defined COM_RS485)
 			RS_startSend();
 		#else 
-            #ifndef THERMOTRONIC //no RS232 nor RS485 - cannot compile with this error!
+            #ifdef HONEYWELL //no RS232 nor RS485 - cannot compile with this error!
 			     #error "need todo"
             #endif
 		#endif

@@ -47,8 +47,9 @@
 # 7.1.2009: Jiri Dobry
 #           modification for THERMOTRONIC
 
+HW = THERMY_V3
 # HW = THERMOTRONIC
-HW = HONEYWELL 
+# HW = HONEYWELL
 
 # MCU name
 ifeq ($(HW),THERMOTRONIC)
@@ -93,7 +94,7 @@ com.c \
 watch.c \
 controller.c
 
-ifneq ($(HW),THERMOTRONIC)
+ifeq ($(HW),HONEYWELL)
     SRC += rs232_485_hw.c
 endif
 
@@ -189,6 +190,9 @@ CFLAGS += -fdata-sections
 
 ifeq ($(HW),THERMOTRONIC)
     CFLAGS += -DTHERMOTRONIC=1
+endif
+ifeq ($(HW),THERMY_V3)
+	CFLAGS += -DTHERMY_V3=1
 endif
 
 

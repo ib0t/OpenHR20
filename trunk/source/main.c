@@ -254,6 +254,9 @@ static inline void init(void)
 #ifdef THERMOTRONIC
 	DDRE|=(1<<PE3); //tvossi TODO:
 	PORTE|=(1<<PE3);
+#elif defined(THERMY_V3)
+	DDRE|=(1<<PE2);
+	PORTE|=(1<<PE2);
 #else
     DDRE = (1<<PE3)|(1<<PE2)|(1<<PE1);  // PE3  activate lighteye
     PORTE = 0x03;
@@ -261,14 +264,14 @@ static inline void init(void)
 #ifdef THERMOTRONIC
     DDRF = (1<<PF2);//tvossi DDRF = (1<<PF3);          // PF3  activate tempsensor
     PORTF = 0xf5;//tvossi PORTF = 0xf3;
-#else
+#else //thermy_v3 has same config
     DDRF = (1<<PF3);          // PF3  activate tempsensor
     PORTF = 0xf3;
 #endif
 
     //! enable pullup on all inputs (keys and m_wheel)
     //! ATTENTION: PB0 & PB6 is input, but we will select it only for read
-#ifdef THERMOTRONIC
+#if (defined(THERMOTRONIC) || defined(THERMY_V3))
 	PORTB = (1<<PB0)|(1<<PB1)|(1<<PB2)|(0<<PB4)|(0<<PB5);
 #else
     PORTB = (0<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3)|(0<<PB6);
@@ -279,9 +282,13 @@ static inline void init(void)
     //! remark for PCMSK0:
     //!     PCINT0 for lighteye (motor monitor) is activated in motor.c using
     //!     mask register PCMSK0: PCMSK0=(1<<PCINT4) and PCMSK0&=~(1<<PCINT4)
-
 #ifdef THERMOTRONIC
 	PCMSK0=(1<<PCINT1); //tvossi added
+#endif
+#ifdef THERMY_V3
+	PCMSK0=(1<<PCINT3);
+#endif
+#if (defined(THERMOTRONIC) || defined(THERMY_V3))
     //! PCMSK1 for keyactions
     PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT8)|(1<<PCINT12);//tvossi was PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT11)|(1<<PCINT13);
 #else

@@ -69,12 +69,17 @@ void LCD_PrintDec3(uint16_t value, uint8_t pos, uint8_t mode); // Print DEC-val 
 void LCD_PrintDecW(uint16_t, uint8_t);         // Print DEC-val (0-9999)                       
 void LCD_PrintHex(uint8_t, uint8_t, uint8_t);  // Print HEX-val (0-ff)
 void LCD_PrintHexW(uint16_t, uint8_t);         // Print HEX-val (0-ffff) 
+#ifdef THERMY_V3
+void LCD_PrintASCIIChar(char c, uint8_t pos, uint8_t mode);
+#endif
 void LCD_PrintChar(uint8_t, uint8_t, uint8_t); // Print one digit 
 void LCD_PrintTemp(uint8_t, uint8_t);          // Print temperature (val+4,9)C
 void LCD_PrintTempInt(int16_t , uint8_t);      // Print temperature (val/100)C
 void LCD_PrintDayOfWeek(uint8_t, uint8_t);     // Print Day of Week (german)
 void LCD_PrintStringID(uint8_t id, uint8_t mode); // Print LCD string ID
+#ifndef THERMY_V3
 #define LCD_PrintDayOfWeek(dow,mode) (LCD_PrintStringID(dow,mode))
+#endif
 
 void LCD_SetSeg(uint8_t, uint8_t);         // Set one Segment (0-69) 
 void LCD_SetHourBarSeg(uint8_t, uint8_t);  // Set HBS (0-23) (Hour-Bar-Segment)
@@ -90,6 +95,7 @@ void task_lcd_update(void);
 //***************************
 // LCD Chars:
 //***************************
+#ifndef THERMY_V3
 #define LCD_CHAR_0       0  //!< char "0"
 #define LCD_CHAR_1       1  //!< char "1"
 #define LCD_CHAR_2       2  //!< char "2"
@@ -126,6 +132,43 @@ void task_lcd_update(void);
 #define LCD_CHAR_S       5  //!< char "5" = "S"
 
 #define LCD_CHAR_NULL  32  //!< space
+#else
+#define FIRST_CHAR      '-'
+#define LCD_CHAR_0      '0'  //!< char "0"
+#define LCD_CHAR_1      '1'  //!< char "1"
+#define LCD_CHAR_2      '2'  //!< char "2"
+#define LCD_CHAR_3      '3'  //!< char "3"
+#define LCD_CHAR_4      '4'  //!< char "4"
+#define LCD_CHAR_5      '5'  //!< char "5"
+#define LCD_CHAR_6      '6'  //!< char "6"
+
+#define LCD_CHAR_7      '7'  //!< char "7"
+#define LCD_CHAR_8      '8'  //!< char "8"
+#define LCD_CHAR_9      '9'  //!< char "9"
+#define LCD_CHAR_A      'A'  //!< char "A"
+#define LCD_CHAR_b      'B'  //!< char "b"
+#define LCD_CHAR_C      'C'  //!< char "C"
+#define LCD_CHAR_d      'D'  //!< char "d"
+
+#define LCD_CHAR_E      'E'  //!< char "E"
+#define LCD_CHAR_F      'F'  //!< char "F"
+#define LCD_CHAR_deg    '°'  //!< symbol degree
+#define LCD_CHAR_n      'N'  //!< char "n"
+#define LCD_CHAR_P      'P'  //!< char "P"
+#define LCD_CHAR_H      'H'  //!< char "H"
+#define LCD_CHAR_I      'I'  //!< char "I"
+#define LCD_CHAR_neg    '-'  //!< char "-"
+#define LCD_CHAR_r      'R'  //!< char "r"
+#define LCD_CHAR_o      'O'  //!< char "r"
+#define LCD_CHAR_L      'L'  //!< char "L"
+#define LCD_CHAR_c      'C'  //!< char "c"
+#define LCD_CHAR_U      'U'  //!< char "U"
+#define LCD_CHAR_t      'T'  //!< char "t"
+#define LCD_CHAR_y      'Y'  //!< char "y"
+#define LCD_CHAR_S      'S'  //!< char "5" = "S"
+
+#define LCD_CHAR_NULL  ' '  //!< space
+#endif
 
 /*! \verbatim
  *******************************************************************************
@@ -215,6 +258,90 @@ void task_lcd_update(void);
 #define LCD_SEG_0C         66   // 12, 3 |  SEG219   |  [8], BIT 3
                                 // 12, 4 |  SEG220   |  [8], BIT 4
 #define LCD_SEG_MOON       68   // 12, 5 |  SEG221   |  [8], BIT 5
+//*****************************************************************
+#elif defined(THERMY_V3)
+
+#define LCD_AUTO		80
+#define LCD_MANU 		120
+#define LCD_BAG 		40
+#define LCD_TOWER 		23
+#define LCD_INHOUSE 	24
+#define LCD_OUTHOUSE 	64
+#define LCD_MOON 		104
+#define LCD_STAR 		144
+#define LCD_BATTERY 	103
+#define LCD_LOCK 		143
+#define LCD_DP 			135
+#define LCD_HOURS 		0
+// LCD_SEG:_xx for LCD_SetSeg   // LCDDR | AtMega169 |  LCD_Data[]
+#define LCD_SEG_B0          88   //  0, 0 |  SEG000   |  [0], BIT 0
+                                //  0, 1 |  SEG001   |  [0], BIT 1
+#define LCD_SEG_B1          48   //  0, 2 |  SEG002   |  [0], BIT 2
+#define LCD_SEG_B2          8   //  0, 3 |  SEG003   |  [0], BIT 3
+#define LCD_SEG_B3          9   //  0, 4 |  SEG004   |  [0], BIT 4
+#define LCD_SEG_B4          49   //  0, 5 |  SEG005   |  [0], BIT 5
+#define LCD_SEG_B5          89   //  0, 6 |  SEG006   |  [0], BIT 6
+#define LCD_SEG_B6          90   //  0, 7 |  SEG007   |  [0], BIT 7
+#define LCD_SEG_B7          50   //  1, 0 |  SEG008   |  [1], BIT 0
+#define LCD_SEG_B8          10   //  1, 1 |  SEG009   |  [1], BIT 1
+#define LCD_SEG_B9          11   //  1, 2 |  SEG010   |  [1], BIT 2
+#define LCD_SEG_B10         51
+#define LCD_SEG_B11         91
+#define LCD_SEG_B12         92
+#define LCD_SEG_B13         52
+#define LCD_SEG_B14        12   //  1, 4 |  SEG012   |  [1], BIT 4
+#define LCD_SEG_B15        13   //  1, 5 |  SEG013   |  [1], BIT 5
+#define LCD_SEG_B16        53   //  1, 6 |  SEG014   |  [1], BIT 6
+#define LCD_SEG_B17        93   //  1, 7 |  SEG015   |  [1], BIT 7
+#define LCD_SEG_B18       134   //  2, 0 |  SEG016   |  [2], BIT 0
+#define LCD_SEG_B19        94   //  2, 1 |  SEG017   |  [2], BIT 1
+#define LCD_SEG_B20        54   //  2, 2 |  SEG018   |  [2], BIT 2
+#define LCD_SEG_B21        14   //  2, 3 |  SEG019   |  [2], BIT 3
+#define LCD_SEG_B22        15   //  2, 4 |  SEG020   |  [2], BIT 4
+#define LCD_SEG_B23        55   //  2, 5 |  SEG021   |  [2], BIT 5
+#define LCD_SEG_BAR24      LCD_HOURS   //  1, 3 |  SEG011   |  [1], BIT 3
+//*****************************************************************
+#define LCD_SEG_AUTO       LCD_AUTO   //  5, 0 |  SEG100   |  [3], BIT 0
+                                //  5, 1 |  SEG101   |  [3], BIT 1
+#define LCD_SEG_PROG       LCD_BAG   //  5, 2 |  SEG102   |  [3], BIT 2
+#define LCD_SEG_3F         27   //  5, 3 |  SEG103   |  [3], BIT 3
+#define LCD_SEG_3G         28   //  5, 4 |  SEG104   |  [3], BIT 4
+#define LCD_SEG_3A         29   //  5, 5 |  SEG105   |  [3], BIT 5
+#define LCD_SEG_3B         30   //  5, 6 |  SEG106   |  [3], BIT 6
+#define LCD_SEG_2F         31   //  5, 7 |  SEG107   |  [3], BIT 7
+#define LCD_SEG_2G         32   //  6, 0 |  SEG108   |  [4], BIT 0
+#define LCD_SEG_2A         33   //  6, 1 |  SEG109   |  [4], BIT 1
+#define LCD_SEG_2B         34   //  6, 2 |  SEG110   |  [4], BIT 2
+#define LCD_SEG_COL2       24   //  6, 3 |  SEG111   |  [4], BIT 3
+#define LCD_SEG_1F         35   //  6, 4 |  SEG112   |  [4], BIT 4
+#define LCD_SEG_1G         36   //  6, 5 |  SEG113   |  [4], BIT 5
+#define LCD_SEG_1A         37   //  6, 6 |  SEG114   |  [4], BIT 6
+#define LCD_SEG_1B         38   //  6, 7 |  SEG115   |  [4], BIT 7
+#define LCD_SEG_0F         39   //  7, 0 |  SEG116   |  [5], BIT 0
+#define LCD_SEG_0G         40   //  7, 1 |  SEG117   |  [5], BIT 1
+#define LCD_SEG_0A         41   //  7, 2 |  SEG118   |  [5], BIT 2
+#define LCD_SEG_0B         42   //  7, 3 |  SEG119   |  [5], BIT 3
+#define LCD_SEG_SNOW       LCD_STAR   //  7, 4 |  SEG120   |  [5], BIT 4
+#define LCD_SEG_SUN        LCD_INHOUSE   //  7, 5 |  SEG121   |  [5], BIT 5
+//*****************************************************************
+                                // 10, 0 |  SEG200   |  [6], BIT 0
+                                // 10, 1 |  SEG201   |  [6], BIT 1
+#define LCD_SEG_MANU       LCD_MANU   // 10, 2 |  SEG202   |  [6], BIT 2
+#define LCD_SEG_3E         51   // 10, 3 |  SEG203   |  [6], BIT 3
+#define LCD_SEG_3D         52   // 10, 4 |  SEG204   |  [6], BIT 4
+#define LCD_SEG_3C         54   // 10, 6 |  SEG206   |  [6], BIT 6
+#define LCD_SEG_2E         55   // 10, 7 |  SEG207   |  [6], BIT 7
+#define LCD_SEG_2D         56   // 11, 0 |  SEG208   |  [7], BIT 0
+#define LCD_SEG_2C         58   // 11, 2 |  SEG210   |  [7], BIT 2
+#define LCD_SEG_COL1       48   // 11, 3 |  SEG211   |  [7], BIT 3
+#define LCD_SEG_1E         59   // 11, 4 |  SEG212   |  [7], BIT 4
+#define LCD_SEG_1D         60   // 11, 5 |  SEG213   |  [7], BIT 5
+#define LCD_SEG_1C         62   // 11, 7 |  SEG215   |  [7], BIT 7
+#define LCD_SEG_0E         63   // 12, 0 |  SEG216   |  [8], BIT 0
+#define LCD_SEG_0D         64   // 12, 1 |  SEG217   |  [8], BIT 1
+#define LCD_SEG_0C         66   // 12, 3 |  SEG219   |  [8], BIT 3
+                                // 12, 4 |  SEG220   |  [8], BIT 4
+#define LCD_SEG_MOON       LCD_MOON   // 12, 5 |  SEG221   |  [8], BIT 5
 //*****************************************************************
 #else
 // LCD_SEG:_xx for LCD_SetSeg   // LCDDR | AtMega169 |  LCD_Data[]
